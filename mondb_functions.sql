@@ -618,19 +618,25 @@ checkpoint activity
 */
 
 
-CREATE OR REPLACE FUNCTION moninfo_2ndq.pg_xlog_info()
+CREATE OR REPLACE FUNCTION moninfo_2ndq.pg_wal_info()
 RETURNS SETOF moninfo_2ndq.mondata_int AS
 $$
   import os
 
-  filelist = os.listdir('pg_xlog')
-  yield 'PGSERVER.pg_xlog_files', len(filelist)
+  if(os.path.exists('pg_xlog')):
+    wal_dir = 'pg_xlog/'
+  else:
+    wal_dir = 'pg_wal/'
+    
+  filelist = os.listdir(wal_dir)
+ 
+  yield 'PGSERVER.pg_wal_files', len(filelist)
 
   dirsize = 0
   for filename in filelist:
-    dirsize += os.path.getsize('pg_xlog/'+filename)
+    dirsize += os.path.getsize(os.path.join(wal_dir,filename))
   
-  yield 'PGSERVER.pg_xlog_size', dirsize
+  yield 'PGSERVER.pg_wal_size', dirsize
 
 $$ language plpythonu security definer;
 
@@ -683,7 +689,7 @@ AS $$
     UNION ALL
     SELECT name, value::text FROM moninfo_2ndq.bgwriter()
     UNION ALL
-    SELECT name, value::text FROM moninfo_2ndq.pg_xlog_info()
+    SELECT name, value::text FROM moninfo_2ndq.pg_wal_info()
     UNION ALL
     SELECT name, value::text FROM moninfo_2ndq.user_connections()
     UNION ALL

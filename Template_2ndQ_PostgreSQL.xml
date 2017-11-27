@@ -1191,12 +1191,12 @@
                     <logtimefmt/>
                 </item>
                 <item>
-                    <name>pg2ndq.PGSERVER.pg_xlog_files</name>
+                    <name>pg2ndq.PGSERVER.pg_wal_files</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>pg2ndq.PGSERVER.pg_xlog_files</key>
+                    <key>pg2ndq.PGSERVER.pg_wal_files</key>
                     <delay>30</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -1234,12 +1234,12 @@
                     <logtimefmt/>
                 </item>
                 <item>
-                    <name>pg2ndq.PGSERVER.pg_xlog_size</name>
+                    <name>pg2ndq.PGSERVER.pg_wal_files</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>pg2ndq.PGSERVER.pg_xlog_size</key>
+                    <key>pg2ndq.PGSERVER.pg_wal_files</key>
                     <delay>30</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -3464,7 +3464,7 @@
             </graph_items>
         </graph>
         <graph>
-            <name>PgSQL xlog files</name>
+            <name>PgSQL wal files</name>
             <width>900</width>
             <height>200</height>
             <yaxismin>0.0000</yaxismin>
@@ -3490,13 +3490,13 @@
                     <type>0</type>
                     <item>
                         <host>Template 2ndq PostgreSQL</host>
-                        <key>pg2ndq.PGSERVER.pg_xlog_files</key>
+                        <key>pg2ndq.PGSERVER.pg_wal_files</key>
                     </item>
                 </graph_item>
             </graph_items>
         </graph>
         <graph>
-            <name>PgSQL xlog size</name>
+            <name>PgSQL wal size</name>
             <width>900</width>
             <height>200</height>
             <yaxismin>0.0000</yaxismin>
@@ -3522,7 +3522,7 @@
                     <type>0</type>
                     <item>
                         <host>Template 2ndq PostgreSQL</host>
-                        <key>pg2ndq.PGSERVER.pg_xlog_size</key>
+                        <key>pg2ndq.PGSERVER.pg_wal_size</key>
                     </item>
                 </graph_item>
             </graph_items>
