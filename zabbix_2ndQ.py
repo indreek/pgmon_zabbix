@@ -18,8 +18,7 @@ LOGDIR_BASE = "/var/log/zabbix/pgmon_2ndQ/"
 LOGDIR = os.path.join(LOGDIR_BASE, sys.argv[1])
 LOGFILE = os.path.join(LOGDIR, 'latest')
 
-open(os.path.join(LOGDIR_BASE,'call.log'),'a').write('%s %s\n' % (time.time(), sys.argv))
-
+#open(os.path.join(LOGDIR_BASE,'call.log'),'a').write('%s %s\n' % (time.time(), sys.argv))
 
 f = open(LOGFILE)
 
@@ -39,4 +38,3 @@ except:
     value = sys.argv[1:]
 
 print value or '0'
-
