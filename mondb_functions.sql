@@ -671,6 +671,54 @@ BEGIN
 END;
 $$;
 
+--Returns current, last_received, last_replayd wal info
+
+CREATE OR REPLACE FUNCTION moninfo_2ndq.wal_info(OUT name text, OUT value text)
+  RETURNS SETOF record
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  res RECORD;
+BEGIN
+    FOR res IN
+
+        SELECT pg_last_wal_receive_lsn
+             , pg_last_wal_replay_lsn
+             , pg_current_wal_lsn
+          FROM pg_last_wal_receive_lsn()
+          JOIN pg_last_wal_replay_lsn() ON TRUE
+          JOIN pg_current_wal_lsn() ON TRUE
+    LOOP
+        name := 'PGSERVER.pg_wal_receive'; value := res.pg_last_wal_receive_lsn::text; RETURN NEXT;
+        name := 'PGSERVER.pg_wal_replay'; value := res.pg_last_wal_replay_lsn::text; RETURN NEXT;
+        name := 'PGSERVER.pg_wal_current'; value := res.pg_current_wal_lsn::text; RETURN NEXT;
+    END LOOP;
+END;
+
+$$;
+
+--Returns all replication slots and their statuses
+
+CREATE OR REPLACE FUNCTION moninfo_2ndq.replication_slots(OUT name text, OUT value text)
+  RETURNS SETOF record
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  res RECORD;
+BEGIN
+    FOR res IN
+
+        SELECT slot_name
+             , active
+          FROM pg_replication_slots
+    LOOP
+        name := format('REPLICATION_SLOT[%s,active]', res.slot_name); value := res.active::int::text; RETURN NEXT;
+    END LOOP;
+END;
+
+$$;
 
 -- convenience function to get all info out in one call
 
@@ -696,6 +744,10 @@ AS $$
     SELECT name, value::text FROM moninfo_2ndq.pg_wal_info()
     UNION ALL
     SELECT name, value::text FROM moninfo_2ndq.user_connections()
+    UNION ALL
+    SELECT name, value::text FROM moninfo_2ndq.replication_slots()
+    UNION ALL
+    SELECT name, value::text FROM moninfo_2ndq.wal_info()
     UNION ALL
     SELECT 'PGSERVER.locks_waiting', count(*)::text from pg_locks where not granted
     ORDER BY 1
