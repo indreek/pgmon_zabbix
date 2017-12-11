@@ -76,11 +76,15 @@ BEGIN
             UNION ALL SELECT 'conn_idle' as sname
             UNION ALL SELECT 'conn_waiting_on_lock' as sname
             UNION ALL SELECT 'conn_running' as sname
+            UNION ALL SELECT 'conn_activity' as sname
         ) AS states LEFT JOIN 
-        (SELECT (CASE WHEN state LIKE 'idle in transaction%' THEN 'conn_idle_in_transaction'
-                     WHEN state = 'idle'                     THEN 'conn_idle'
-                     WHEN wait_event IS NOT NULL             THEN 'conn_waiting_on_lock' 
-                                                             ELSE 'conn_running' 
+        (SELECT (CASE 
+					 WHEN lower(wait_event_type) = 'activity' 
+						  OR wait_event_type IS NULL 					 THEN 'conn_activity' 
+					 WHEN state LIKE 'idle in transaction%' 			 THEN 'conn_idle_in_transaction'
+                     WHEN state = 'idle'                     			 THEN 'conn_idle'
+                     WHEN state = 'active' AND wait_event_type = 'lock'	 THEN 'conn_waiting_on_lock'
+																		 ELSE 'conn_running' 
                 END) AS cname, 
                 count(*) as count 
           FROM pg_stat_activity
@@ -617,7 +621,7 @@ checkpoint activity
    length of checkpoint (from munin)
 */
 
-
+DROP FUNCTION IF EXISTS moninfo_2ndq.pg_xlog_info();
 CREATE OR REPLACE FUNCTION moninfo_2ndq.pg_wal_info()
 RETURNS SETOF moninfo_2ndq.mondata_int AS
 $$
