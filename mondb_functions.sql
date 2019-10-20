@@ -478,7 +478,7 @@ $$ LANGUAGE plpythonu SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION moninfo_2ndq.usr_object_totals_per_db()
 RETURNS SETOF moninfo_2ndq.mondata_int AS
 $$
-    import psycopg2, re
+    import psycopg2, re, sys
     import psycopg2.extras
     ftlookup = {26:'oid', 19:'name', 20:'bigint', 1184:'timestamptz'}
     db_port = plpy.execute("select current_setting('port')")[0]['current_setting']
@@ -490,7 +490,7 @@ $$
         for table_name in ['pg_stat_user_tables', 'pg_statio_user_tables', 'pg_stat_user_indexes', 'pg_statio_user_indexes']:
             try:
                 cur.execute('select * from %s limit 1' % table_name)
-                ftypes =  [(fname, ftlookup[ftype]) for (fname, ftype) in [row[:2] for row in cur.description]]
+                ftypes =  [(fname, ftlookup[ftype]) for (fname, ftype) in [(row[0], row[1]) for row in cur.description]]
                 stotals_query = 'SELECT %s FROM %s' % (
                     ','.join(['sum(%(fname)s)::bigint as %(fname)s' % locals() for (fname,ftype) in ftypes if ftype == 'bigint']),
                     table_name
